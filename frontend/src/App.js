@@ -16,6 +16,7 @@ import "./components/style.css";
 import axios from 'axios';
 import useFetchCourses from './hooks/useFetchCourses';
 import CourseComponent from './components/CourseComponent';
+import Results from './components/Results';
 
 function App() {
   const [toggleBtn, setToggleBtn] = useState(true);
@@ -63,6 +64,10 @@ function App() {
             <Route 
               path="/courses" 
               element={<CourseComponent courses={courses} loading={coursesLoading} error={coursesError} />} 
+            />
+            <Route 
+              path="/results" 
+              element={<Results />} 
             />
             <Route path="*" element={<NotFound />} /> {/* This acts as a catch-all route */}
           </Routes>

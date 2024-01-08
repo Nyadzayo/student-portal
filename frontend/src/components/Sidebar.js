@@ -7,6 +7,7 @@ const nav = [
   { text: "Student", link: "/students", icon: "box" },
   { text: "Teacher", link: "/teachers", icon: "tv", active: true },
   { text: "Course", link: "/courses", icon: "user" },
+  { text: "Results", link: "/results", icon: "book" },
   { text: "About", link: "/about", icon: "book" }
 ];
 

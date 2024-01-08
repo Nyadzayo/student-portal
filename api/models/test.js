@@ -17,7 +17,10 @@ module.exports = (sequelize) => {
   }, {
     sequelize,
     modelName: 'Test',
-    tableName: 'tests'
+    tableName: 'tests',
+    timestamps: true, // Add this line to include createdAt and updatedAt fields
+    createdAt: 'created_at', // Optionally rename the createdAt column if needed
+    updatedAt: 'updated_at'
   });
 
   Test.associate = (models) => {

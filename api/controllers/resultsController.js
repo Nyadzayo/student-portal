@@ -22,7 +22,7 @@ exports.createResult = async (req, res) => {
 // Get a result by ID
 exports.getResultById = async (req, res) => {
   try {
-    const result = await resultService.getResultById(req.params.id);
+    const result = await resultService.getResultsByStudentId(req.params.id);
     if (result) {
       res.json(result);
     } else {
