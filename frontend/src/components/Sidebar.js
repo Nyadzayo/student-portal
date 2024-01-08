@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Grid, Button, Menu, Segment, Icon, Header, Image } from 'semantic-ui-react';
 
@@ -11,17 +11,21 @@ const nav = [
   { text: "About", link: "/about", icon: "book" }
 ];
 
-const Sidebar = ({ toggleBtn }) => {
+const Sidebar = ({ toggleBtn, userRole }) => {
   const navigate = useNavigate(); // Get the navigate function
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')) || {});
 
   const navigateTo = (path) => {
     navigate(path); // Navigate to the specified path
   };
 
+  // Filter the nav items based on userRole
+  const filteredNav = user.role === 'student' ? [nav.find(item => item.link === '/')] : nav;
+
   return (
     <div className={`${toggleBtn ? "sidebar collapse" : "sidebar"}`} data-simplebar>
       <ul>
-        {nav.map(item => (
+        {filteredNav.map(item => (
           <li key={item.text}>
             {/* Use onClick to navigate programmatically */}
             <a href={`${item.link}`} onClick={() => navigateTo(item.link)} className={item.active ? "active" : ""}>

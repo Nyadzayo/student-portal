@@ -6,7 +6,7 @@ const ResultsModal = ({isOpen, onClose, results }) => {
     onClose();
   };
   return (
-    <Modal open={true}> {/* Assuming you want the modal to always be open when this component is rendered */}
+    <Modal open={isOpen} onClose={handleClose}> {/* Assuming you want the modal to always be open when this component is rendered */}
       <Modal.Header>Results Details</Modal.Header>
       <Modal.Content>
         {results.map((result) => (

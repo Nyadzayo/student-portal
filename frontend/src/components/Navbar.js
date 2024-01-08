@@ -1,6 +1,4 @@
-import React from "react";
-
-const Navbar = ({ setToggle }) => {
+const Navbar = ({ setToggle, children, onLogout }) => {
   return (
     <div className="navbar">
       <div className="brand">
@@ -14,9 +12,14 @@ const Navbar = ({ setToggle }) => {
         </div>
       </div>
       <div className="left">
-        <i className="fas fa-sign-out-alt" />
+        {onLogout && (
+          <button className="logout-button" onClick={onLogout}>
+            Logout
+          </button>
+        )}
       </div>
     </div>
   );
 };
+
 export default Navbar;

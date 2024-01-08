@@ -1,79 +1,108 @@
 // src/App.js
-import React , { useEffect, useState }from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate,useNavigate } from 'react-router-dom';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import NotFound from './components/NotFound';
-import "simplebar"; // or "import SimpleBar from 'simplebar';" if you want to use it manually.
-import "simplebar/dist/simplebar.css";
-import ReactDOM from "react-dom";
-import Navbar from './components/Navbar';
-import Sidebar from "./components/Sidebar";
-import Content from "./components/Content";
-import MessageExampleAttached from "./components/StudentList";
 import "semantic-ui-css/semantic.min.css";
 import "./components/style.css";
-import axios from 'axios';
-import useFetchCourses from './hooks/useFetchCourses';
+import ReactDOM from "react-dom";
+import Navbar from './components/Navbar';
+import Sidebar from './components/Sidebar';
+import Content from './components/Content';
+import MessageExampleAttached from './components/StudentList';
 import CourseComponent from './components/CourseComponent';
 import Results from './components/Results';
+import axios from 'axios';
 
 function App() {
   const [toggleBtn, setToggleBtn] = useState(true);
-  const toggle = () => setToggleBtn(val => !val);
   const [students, setStudents] = useState([]);
   const [teachers, setTeachers] = useState([]);
-  const { courses, loading: coursesLoading, error: coursesError } = useFetchCourses();
-
-  useEffect(() => {
-    const fetchTeachers = async () => {
-      try {
-        const teachersResponse = await axios.get('http://localhost:3001/api/teachers');
-        setTeachers(teachersResponse.data);
-      } catch (error) {
-        console.error('Error fetching teachers:', error);
-      }
-    };
+  const [courses, setCourses] = useState([]);
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
+  const [userAuth, setUserAuth] = useState(() => {
+    const storedUser = localStorage.getItem('user');
+    try {
+      return storedUser ? JSON.parse(storedUser) : null; // Parse only if storedUser is not null or undefined
+    } catch (error) {
+      console.error('Error parsing user from localStorage:', error);
+      return null; // Return null if parsing fails
+    }
+  });
   
-    fetchTeachers();  // Make sure to call the function here
-  }, []);  // Empty dependency array means this will only run once when the component mounts
+
+  const user = localStorage.getItem('user');
+  const navigate = useNavigate(); // Get the navigate function
+
+  const handleLogin = (token, user) => {
+    localStorage.setItem('token', token); // Store token in local storage
+    localStorage.setItem('user', JSON.stringify(user)); // Store user information in local storage as a JSON string
+    setIsAuthenticated(true);
+    setUserAuth(user); // Update the userAuth state with the user information
+    navigate('/'); 
+  };
+    console.log(userAuth)
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setIsAuthenticated(false);
+  };
+
   useEffect(() => {
-    // Fetch students from the API
-    const fetchStudents = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/api/students');
-        setStudents(response.data);
+        const [teachersResponse, studentsResponse, coursesResponse] = await Promise.all([
+          axios.get('http://localhost:3001/api/teachers'),
+          axios.get('http://localhost:3001/api/students'),
+          axios.get('http://localhost:3001/api/courses'),
+        ]);
+
+        setTeachers(teachersResponse.data);
+        setStudents(studentsResponse.data);
+        setCourses(coursesResponse.data);
       } catch (error) {
-        console.error('Error fetching students:', error);
+        console.error('Error fetching data:', error);
       }
     };
 
-    fetchStudents();
+    fetchData();
   }, []);
+
   return (
-    <Router>
       <div className="top-wrapper">
-        <Navbar setToggle={toggle} />
-        <Sidebar toggleBtn={toggleBtn} />
-        <Content toggleBtn={toggleBtn}>
+        {isAuthenticated && (
+          <>
+            <Navbar setToggle={setToggleBtn} onLogout={handleLogout} />
+            <Sidebar toggleBtn={toggleBtn} user ={userAuth} />
+          </>
+        )}
+        <Content className="top-wrapper" toggleBtn={toggleBtn}>
           <Routes>
-            <Route path="/" element={<Dashboard students={students} />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/students" element={<MessageExampleAttached  students={students} />} />
-            <Route path="/teachers" element={<MessageExampleAttached students={teachers}/>}/>
-            <Route 
-              path="/courses" 
-              element={<CourseComponent courses={courses} loading={coursesLoading} error={coursesError} />} 
+            <Route
+              path="/"
+              element={isAuthenticated ? <Dashboard students={students} user={userAuth} /> : <Navigate to="/login" replace />}
             />
-            <Route 
-              path="/results" 
-              element={<Results />} 
+            <Route path="/login" element={<Login onLogin={handleLogin} />} />
+            <Route
+              path="/students"
+              element={isAuthenticated ? <MessageExampleAttached students={students} /> : <Navigate to="/login" replace />}
             />
-            <Route path="*" element={<NotFound />} /> {/* This acts as a catch-all route */}
+            <Route
+              path="/teachers"
+              element={isAuthenticated ? <MessageExampleAttached students={teachers} /> : <Navigate to="/login" replace />}
+            />
+            <Route
+              path="/courses"
+              element={isAuthenticated ? <CourseComponent courses={courses} /> : <Navigate to="/login" replace />}
+            />
+            <Route
+              path="/results"
+              element={isAuthenticated ? <Results /> : <Navigate to="/login" replace />}
+            />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Content>
       </div>
-    </Router>
   );
 }
 

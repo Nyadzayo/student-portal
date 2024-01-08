@@ -25,6 +25,9 @@ body {
 .top-wrapper {
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.06), 0 8px 16px 0 rgba(0, 0, 0, 0.2),
     0 8px 16px 0 rgba(0, 0, 0, 0.2), 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+    overflow-x: auto; /* Horizontal overflow */
+  overflow-y: auto; /* Vertical overflow */
+  max-height: 80vh; /* Set max height as per your requirement */
 }
 
 .navbar {

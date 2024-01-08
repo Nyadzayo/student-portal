@@ -8,7 +8,8 @@ exports.getAllResults = async () => {
       {
        include:[
         { model: Student},
-        { model: Test }   
+        { model: Test },
+           
        ]
       }
     );
