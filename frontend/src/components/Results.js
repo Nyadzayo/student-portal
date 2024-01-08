@@ -75,7 +75,7 @@ const Results = () => {
       </Table>
        {selectedResult && (
         <ResultsModal
-          isOpen={isModalOpen}
+          isOpen={true}
           onClose={closeModal}
           results={selectedResult}
         />
